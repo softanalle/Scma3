@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="android" name="Android">
+      <configuration>
+        <option name="GEN_FOLDER_RELATIVE_PATH_APT" value="/../../Scma3/gen" />
+        <option name="GEN_FOLDER_RELATIVE_PATH_AIDL" value="/../../Scma3/gen" />
+        <option name="MANIFEST_FILE_RELATIVE_PATH" value="/../../Scma3/AndroidManifest.xml" />
+        <option name="RES_FOLDER_RELATIVE_PATH" value="/../../Scma3/res" />
+        <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/../../Scma3/assets" />
+        <option name="LIBS_FOLDER_RELATIVE_PATH" value="/../../Scma3/libs" />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
+    <output url="file://$MODULE_DIR$/out/production" />
+    <output-test url="file://$MODULE_DIR$/out/test" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="Android 4.1.2 Google APIs" jdkType="Android SDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="ioiolibaccessory" level="project" />
+    <orderEntry type="library" name="ioiolibandroid" level="project" />
+    <orderEntry type="library" name="ioiolibbt" level="project" />
+    <orderEntry type="library" name="microlog4android-1.0.0" level="project" />
+  </component>
+</module>
+

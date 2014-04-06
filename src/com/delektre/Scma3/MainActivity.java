@@ -5,12 +5,13 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import static com.delektre.Scma3.R.*;
-
-
-import jjil.android.Preview;
 import jjil.android.CrosshairOverlay;
+import jjil.android.Preview;
+
+import static com.delektre.Scma3.R.id;
+import static com.delektre.Scma3.R.layout;
+
+
 
 public class MainActivity extends Activity {
 
