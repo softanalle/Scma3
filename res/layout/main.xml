@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="fill_parent"
               android:layout_height="fill_parent"
@@ -10,7 +10,8 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_below="@+id/ui_main_layer2"
-            >
+            android:layout_alignParentLeft="true" android:layout_marginLeft="0dp" android:layout_alignParentTop="true"
+            android:layout_marginTop="0dp">
 
         <jjil.android.Preview
                 android:id="@+id/ui_main_preview"
@@ -25,22 +26,40 @@
                 android:background="#00FFFFFF">
         </jjil.android.CrosshairOverlay>
     </FrameLayout>
-    <LinearLayout
+    <RelativeLayout
             android:id="@+id/ui_main_layer2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
             android:layout_gravity="bottom"
             android:orientation="horizontal"
-            android:alpha="100">
+            android:alpha="100" android:layout_alignParentLeft="true" android:layout_marginLeft="0dp"
+            android:layout_alignParentTop="true" android:layout_marginTop="0dp">
 
         <ProgressBar android:layout_width="fill_parent"
                      android:layout_height="wrap_content"
                      android:id="@+id/ui_main_progress"
-                     android:max="100" android:progress="50"/>
-    </LinearLayout>
+                     android:max="100" android:progress="50" android:layout_gravity="bottom"
+                     android:layout_alignParentLeft="true"
+                     android:layout_alignParentTop="true"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@+string/label_button_focus"
+                android:layout_gravity="center_vertical|right"
+                android:layout_alignParentLeft="false"
+                android:layout_alignParentTop="false" android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="false" android:layout_centerVertical="true"
+                android:id="@+id/ui_main_focus_button"/>
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@+string/label_button_click"
+                android:id="@+id/ui_main_click_button" android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"/>
+    </RelativeLayout>
 
 
 
 
-</LinearLayout>
+</RelativeLayout>
 
