@@ -22,10 +22,10 @@
     </content>
     <orderEntry type="jdk" jdkName="Android 4.1.2 Google APIs" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="ioiolibaccessory" level="project" />
-    <orderEntry type="library" name="ioiolibandroid" level="project" />
-    <orderEntry type="library" name="ioiolibbt" level="project" />
-    <orderEntry type="library" name="microlog4android-1.0.0" level="project" />
+    <orderEntry type="library" exported="" name="ioiolibaccessory" level="project" />
+    <orderEntry type="library" exported="" name="ioiolibandroid" level="project" />
+    <orderEntry type="library" exported="" name="ioiolibbt" level="project" />
+    <orderEntry type="library" exported="" name="microlog4android-1.0.0" level="project" />
   </component>
 </module>
 

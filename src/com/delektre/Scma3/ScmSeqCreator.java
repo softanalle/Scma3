@@ -52,13 +52,21 @@ public class ScmSeqCreator implements android.hardware.Camera.PreviewCallback,
     public void onPreviewFrame(byte[] data, Camera camera) {
         Camera.Parameters cameraParameters = camera.getParameters();
         String focusMode = camera.getParameters().getFocusMode();
-        boolean bUseAutoFocus =  focusMode.equals(Camera.Parameters.FOCUS_MODE_AUTO) ||
+        boolean bUseAutoFocus = focusMode.equals(Camera.Parameters.FOCUS_MODE_AUTO) ||
                 focusMode.equals(Camera.Parameters.FOCUS_MODE_MACRO);
         if (bUseAutoFocus && (mnFocused == 0 || mbFoundBarcode)) {
             Log.d(TAG, "exit, mnFocused is 0 or mbFoundBarcode is "
                     + mbFoundBarcode + " use auto " + bUseAutoFocus);
             return;
         }
+        // TODO: implement our own routine for Camera Preview visualization
+        return;
+    }
+    private void doNothing(byte[] data, Camera camera) {
+        Camera.Parameters cameraParameters = camera.getParameters();
+        String focusMode = camera.getParameters().getFocusMode();
+        boolean bUseAutoFocus = focusMode.equals(Camera.Parameters.FOCUS_MODE_AUTO) ||
+                focusMode.equals(Camera.Parameters.FOCUS_MODE_MACRO);
         try {
             int imageFormat = cameraParameters.getPreviewFormat();
             // we only know how to process NV21 format (the default format)
