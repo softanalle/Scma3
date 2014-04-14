@@ -4,6 +4,9 @@
     <!-- error messages -->
     <string name="err_no_cameras">Could not find any cameras in system!</string>
 
+    <string name="label_button_click">Take picture</string>
+    <string name="label_button_focus">Focus image</string>
+
     <!-- configuration setting strings -->
 
 </resources>

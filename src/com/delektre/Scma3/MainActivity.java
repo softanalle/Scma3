@@ -7,16 +7,23 @@ import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.os.Environment;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import com.google.code.microlog4android.Level;
 import com.google.code.microlog4android.Logger;
 import com.google.code.microlog4android.LoggerFactory;
-import com.google.code.microlog4android.config.PropertyConfigurator;
 import jjil.android.CrosshairOverlay;
 import jjil.android.Preview;
 
+import java.io.File;
+import java.io.IOException;
+
 import static com.delektre.Scma3.R.id;
 import static com.delektre.Scma3.R.layout;
+
 
 
 public class MainActivity extends Activity {
@@ -33,6 +40,10 @@ public class MainActivity extends Activity {
 
     private boolean stillLoading = true;
 
+    private Button clickButton, zoomButton;
+
+    protected static final Logger logger = LoggerFactory.getLogger();
+
     /**
      * Called when the activity is first created.
      */
@@ -47,6 +58,9 @@ public class MainActivity extends Activity {
         mProgress = (ProgressBar) findViewById(R.id.ui_main_progress);
         mSeqHandler = new ScmSeqCreator(mProgress);
 
+        initUI();
+        testSystem();
+        initCamera();
         CrosshairOverlay co = (CrosshairOverlay) findViewById(id.crosshairoverlay1);
 
         if (checkCameraHardware(getApplicationContext())) {
@@ -141,6 +155,13 @@ public class MainActivity extends Activity {
             } else {
             }
             getSettings();
+                    //delayed focusing works on more devices
+                    mSeqHandler.autoFocusLater(mCamera);
+                } else {
+                }
+            } catch (RuntimeException re) {
+                logger.error(re.getMessage());
+            }
         }
     }
 
@@ -176,7 +197,102 @@ public class MainActivity extends Activity {
             Toast.makeText(getApplicationContext(), "Exeption: " + e, Toast.LENGTH_LONG).show();
             logger.error("Exeption: " + e);
         }
-
     }
 
+    private void initUI() {
+        mProgress = (ProgressBar) findViewById(R.id.ui_main_progress);
+        mSeqHandler = new ScmSeqCreator(mProgress);
+
+        clickButton = (Button) findViewById(id.ui_main_click_button);
+        zoomButton = (Button) findViewById(id.ui_main_focus_button);
+
+        CrosshairOverlay co = (CrosshairOverlay) findViewById(id.crosshairoverlay1);
+
+        nCameras = Camera.getNumberOfCameras();
+        mPreview = (Preview) findViewById(id.ui_main_preview);
+
+        clickButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mProgress.setProgress(0);
+                File tmp = new File(Environment.getExternalStorageDirectory(), "/SCM");
+                for (int i = 0; i < 6; i++) {
+                    mProgress.setProgress(i * 12);
+                    mPreview.savePicture(saveDir +  "test_" + i);
+                }
+            }
+        });
+        zoomButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                logger.debug("preview.doFocus()");
+                mCamera.autoFocus(null);
+            }
+        });
+    }
+
+    private String saveDir;
+
+    private void testSystem() {
+        try {
+            File tmp = new File(Environment.getExternalStorageDirectory(), "/SCM");
+            if (!tmp.exists()) {
+                tmp.mkdir();
+                saveDir = tmp.getCanonicalPath();
+                logger.info("Creating missing data directory: " + tmp.getCanonicalPath());
+            }
+            saveDir = tmp.getCanonicalPath() + File.pathSeparator;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        /*
+        String tmp = "";
+        try {
+            tmp = Environment.getExternalStorageDirectory().getCanonicalPath();
+        } catch (Exception e) {
+
+        }
+        String mStorageDir;
+        try {
+
+            //Level loglevel = Level.valueOf(sharedPref.getString(KEY_PREF_LOGLEVEL, "DEBUG"));
+            Level loglevel = Level.valueOf("DEBUG");
+
+            logger.setLevel(loglevel);
+            logger.debug("Set loglevel to: " + logger.getLevel().toString());
+        } catch (Exception e) {
+            logger.error("Exception while setting loglevel: " + e.toString());
+
+        }
+        try {
+            mStorageDir = new File(tmp + "/SCM").getCanonicalPath();
+
+        } catch (IOException e1) {
+            String msg = "";
+            if (e1.getMessage() != null) {
+                msg = e1.getMessage();
+            }
+            logger.error(e1.toString() + " : " + msg);
+            //logger.error(e1.toString(), msg);
+        } catch (Exception e) {
+            String msg = "";
+            if (e.getMessage() != null) {
+                msg = e.getMessage();
+            }
+            logger.error(e.toString());
+            logger.error(msg);
+        }
+
+        try {
+            File saveDir = new File(mStorageDir);
+            if (!saveDir.isDirectory()) {
+                saveDir.mkdir();
+            }
+        } catch (Exception e) {
+            logger.error("Error in creation of StorageDIR: " + e.toString());
+            //Log.d(TAG, "Error in creation of savedir");
+        }
+        */
+
+    }
 }
