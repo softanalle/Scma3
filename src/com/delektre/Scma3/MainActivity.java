@@ -25,6 +25,9 @@ import ioio.lib.util.IOIOLooper;
 import ioio.lib.util.android.IOIOActivity;
 import jjil.android.CrosshairOverlay;
 import jjil.android.Preview;
+import org.androidannotations.annotations.Click;
+import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ViewById;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +37,7 @@ import static com.delektre.Scma3.R.layout;
 
 
 
+@EActivity(layout.main)
 public class MainActivity extends IOIOActivity {
 
     protected static final Logger logger = LoggerFactory.getLogger();
@@ -49,7 +53,15 @@ public class MainActivity extends IOIOActivity {
 
     private boolean stillLoading = true;
 
-    private Button clickButton, zoomButton;
+    // private Button clickButton, zoomButton;
+
+    //@ViewById(uiMainButtonFocus)
+    //Button uiMainButtonFocus;
+
+    //@ViewById(uiMainButtonPicture)
+    //Button uiMainButtonPicture;
+
+
     private int mLedCount = 6;
     //protected static final Logger logger = LoggerFactory.getLogger();
 
@@ -131,7 +143,7 @@ public class MainActivity extends IOIOActivity {
 
     }
 
-
+/*
     protected void onResume() {
         super.onResume();
         if (!stillLoading) {
@@ -162,7 +174,7 @@ public class MainActivity extends IOIOActivity {
             }
         }
     }
-
+*/
 
     private void getSettings() {
         logger.debug("getSettings()");
@@ -248,8 +260,8 @@ public class MainActivity extends IOIOActivity {
         mProgress = (ProgressBar) findViewById(R.id.ui_main_progress);
 
 
-        clickButton = (Button) findViewById(id.ui_main_click_button);
-        zoomButton = (Button) findViewById(id.ui_main_focus_button);
+        //clickButton = (Button) findViewById(id.ui_main_click_button);
+        //zoomButton = (Button) findViewById(id.ui_main_focus_button);
 
         //mProgress = (ProgressBar) findViewById(R.id.ui_main_progress);
         //mSeqHandler = new ScmSeqCreator(mProgress);
@@ -263,6 +275,7 @@ public class MainActivity extends IOIOActivity {
 
         mSeqHandler = new ScmSeqCreator(mPreview);
 
+        /*
         clickButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -281,7 +294,27 @@ public class MainActivity extends IOIOActivity {
                 mCamera.autoFocus(null);
             }
         });
+        */
     }
+
+    @Click
+    void uiMainButtonFocus() {
+        logger.debug("uiMainButtonFocus()");
+        mCamera.autoFocus(null);
+    }
+
+    @Click
+    void uiMainButtonPicture() {
+        logger.debug("uiMainButtonPicture()");
+        mProgress.setProgress(0);
+        File tmp = new File(Environment.getExternalStorageDirectory(), "/SCM");
+        for (int i = 0; i < 6; i++) {
+            mProgress.setProgress(i * 12);
+            mPreview.savePicture(saveDir + "test_" + i);
+        }
+    }
+
+
 
     private String saveDir;
 

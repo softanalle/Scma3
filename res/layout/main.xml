@@ -53,12 +53,12 @@
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="false"
                 android:layout_centerVertical="true"
-                android:id="@+id/ui_main_focus_button"/>
+                android:id="@+id/uiMainButtonFocus"/>
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@+string/label_button_click"
-                android:id="@+id/ui_main_click_button"
+                android:id="@+id/uiMainButtonPicture"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"/>
     </RelativeLayout>
