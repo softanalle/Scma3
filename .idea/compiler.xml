@@ -15,8 +15,7 @@
     </wildcardResourcePatterns>
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true">
-        <sourceOutputDir name="aa-gen" />
-        <sourceTestOutputDir name="aa_tests" />
+        <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/AndroidTools/androidannotations-bundle-3.0.1/androidannotations-3.0.1.jar" />
         </processorPath>

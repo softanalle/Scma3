@@ -14,7 +14,7 @@
             android:layout_marginTop="0dp">
 
         <jjil.android.Preview
-                android:id="@+id/ui_main_preview"
+                android:id="@+id/uiMainPreview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 >
@@ -37,7 +37,7 @@
 
         <ProgressBar android:layout_width="fill_parent"
                      android:layout_height="20dp"
-                     android:id="@+id/ui_main_progress"
+                     android:id="@+id/uiMainProgress"
                      android:max="100" android:progress="50"
                      android:layout_gravity="bottom"
                      android:layout_alignParentLeft="true"

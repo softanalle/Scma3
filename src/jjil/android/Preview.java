@@ -29,10 +29,13 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
     protected static final Logger logger = LoggerFactory.getLogger();
     private boolean isPreview_ = false;
 
+    public Camera getCamera() {
+        return mCamera;
+    }
+
     public interface PreviewSizeChangedCallback {
         void previewSizeChanged();
     }
-
 
 
     private Camera mCamera;
@@ -41,7 +44,7 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
     private PreviewSizeChangedCallback mPreviewSizeChangedCallback = null;
     private List<Size> mSupportedPreviewSizes;
     private SurfaceView mSurfaceView;
-    
+
     public Preview(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
 
@@ -53,7 +56,7 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
-    
+
     public void setCamera(Camera camera) {
         mCamera = camera;
         if (mCamera != null) {
@@ -63,22 +66,22 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     public void switchCamera(Camera camera) {
-       setCamera(camera);
-       try {
-           camera.setPreviewDisplay(mHolder);
-       } catch (IOException exception) {
-           Log.e(TAG, "IOException caused by setPreviewDisplay()", exception);
-       }
-       if (mSupportedPreviewSizes != null) {
-           mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes, 
-                   getMeasuredWidth(), getMeasuredHeight());
-       }
-       Camera.Parameters parameters = camera.getParameters();
-       parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
-       requestLayout();
+        setCamera(camera);
+        try {
+            camera.setPreviewDisplay(mHolder);
+        } catch (IOException exception) {
+            Log.e(TAG, "IOException caused by setPreviewDisplay()", exception);
+        }
+        if (mSupportedPreviewSizes != null) {
+            mPreviewSize = getOptimalPreviewSize(mSupportedPreviewSizes,
+                    getMeasuredWidth(), getMeasuredHeight());
+        }
+        Camera.Parameters parameters = camera.getParameters();
+        parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
+        requestLayout();
 
         //Camera.Parameters parameters = mCamera.getParameters();
-        parameters.set("rawsave-mode",  "1");
+        parameters.set("rawsave-mode", "1");
         //parameters.set("rawfname",  filename + ".raw");
         // mCamera.setParameters(parameters);
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
@@ -86,8 +89,7 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
 
         if (parameters.isAutoWhiteBalanceLockSupported()) {
             parameters.setAutoWhiteBalanceLock(true);
-        }
-        else {
+        } else {
             Toast.makeText(getContext(), "Unable to lock AutoWhiteBalance", Toast.LENGTH_LONG).show();
             logger.debug("preview.surfaceChanged(): unable to lock autoWhiteBalance");
         }
@@ -98,14 +100,11 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
             Toast.makeText(getContext(), "Unable to lock AutoExposure", Toast.LENGTH_LONG).show();
             logger.debug("unable to lock AutoExposure");
         }
-        try
-       {
-           camera.setParameters(parameters);
-       }
-       catch (RuntimeException e)
-       {
-           Log.e(TAG, "error setting parameters", e);
-       }
+        try {
+            camera.setParameters(parameters);
+        } catch (RuntimeException e) {
+            Log.e(TAG, "error setting parameters", e);
+        }
     }
 
     @Override
@@ -151,7 +150,7 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
             }
         }
     }
-    
+
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, acquire the camera and tell it where
         // to draw.
@@ -204,7 +203,7 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
         }
         return optimalSize;
     }
-    
+
     public void setPreviewSizeChangedCallback(PreviewSizeChangedCallback callback) {
         mPreviewSizeChangedCallback = callback;
     }
@@ -218,12 +217,9 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
             parameters.setPreviewSize(mPreviewSize.width, mPreviewSize.height);
             requestLayout();
 
-            try
-            {
+            try {
                 mCamera.setParameters(parameters);
-            }
-            catch (RuntimeException e)
-            {
+            } catch (RuntimeException e) {
                 Log.e(TAG, "error setting parameters", e);
             }
 
@@ -235,39 +231,40 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
     }
 
     private boolean writeImageToDisc(String filename, byte[] data) {
-            logger.debug("preview.writeImageToDisc(" + filename + ", " + data.length + " bytes)");
-                FileOutputStream outStream = null;
-                try {
-                        outStream = new FileOutputStream( filename );
-                        outStream.write(data);
-                        outStream.close();
-                        //Log.d(TAG, "writeImageToDisc - wrote bytes: " + data.length);
-                        Toast.makeText(getContext(), filename + " - wrote bytes: " + data.length, Toast.LENGTH_SHORT).show();
-                        logger.debug("preview.writeImageToDisc(" + filename + ")");
-                } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                        logger.debug("preview.writeImageToDisc(): FileNotFoundExeption: " + e.toString());
-                        return false;
-                } catch (IOException e) {
-                        logger.error("preview.writeImageToDisc(): " + e.toString());
-                        e.printStackTrace();
-                        return false;
-                } finally {
-                }
-                logger.debug("writeImageToDisc - complete");
-                return true;
+        logger.debug("preview.writeImageToDisc(" + filename + ", " + data.length + " bytes)");
+        FileOutputStream outStream = null;
+        try {
+            outStream = new FileOutputStream(filename);
+            outStream.write(data);
+            outStream.close();
+            //Log.d(TAG, "writeImageToDisc - wrote bytes: " + data.length);
+            Toast.makeText(getContext(), filename + " - wrote bytes: " + data.length, Toast.LENGTH_SHORT).show();
+            logger.debug("preview.writeImageToDisc(" + filename + ")");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            logger.debug("preview.writeImageToDisc(): FileNotFoundExeption: " + e.toString());
+            return false;
+        } catch (IOException e) {
+            logger.error("preview.writeImageToDisc(): " + e.toString());
+            e.printStackTrace();
+            return false;
+        } finally {
+        }
+        logger.debug("writeImageToDisc - complete");
+        return true;
 
     }
 
-     /**
-         * take picture and store JPEG and RAW images
-         * @param filename the full filename for image, without suffix (.jpg, .raw)
-         */
-        public void savePicture(final String filename) {
-                Camera.PictureCallback jpegCallback = null;
-                Camera.PictureCallback rawCallback = null;
+    /**
+     * take picture and store JPEG and RAW images
+     *
+     * @param filename the full filename for image, without suffix (.jpg, .raw)
+     */
+    public void savePicture(final String filename) {
+        Camera.PictureCallback jpegCallback = null;
+        Camera.PictureCallback rawCallback = null;
 
-                //if ( doJPEG ) {
+        //if ( doJPEG ) {
             /*
                 if ( doRAW ) {
                         Camera.Parameters parameters = mCamera.getParameters();
@@ -276,23 +273,27 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
                         mCamera.setParameters(parameters);
                 }
                 */
-                //startPreview();
-                jpegCallback = new Camera.PictureCallback() {
+        //startPreview();
+        jpegCallback = new Camera.PictureCallback() {
 
-                        private String mJpegFilename = filename;
-                        @Override public void onPictureTaken(byte[] data, Camera camera) {
-                                try {
-                                        writeImageToDisc(mJpegFilename + ".JPG", data);
+            private String mJpegFilename = filename;
 
-                                        Thread.sleep(200);
-                                } catch (InterruptedException e) {
-                                        Toast.makeText(getContext(), "Error while saving JPEG file: " + e, Toast.LENGTH_LONG).show();
-                                }
-                            startPreview();
-                        }
+            @Override
+            public void onPictureTaken(byte[] data, Camera camera) {
+                try {
+                    writeImageToDisc(mJpegFilename + ".JPG", data);
 
-                };
-                //}
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    Toast.makeText(getContext(), "Error while saving JPEG file: " + e, Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(getContext(), "Other Exception occured: " + e.toString(), Toast.LENGTH_LONG).show();
+                }
+                startPreview();
+            }
+
+        };
+        //}
                 /*
                 if ( doRAW ) {
                         if ( doJPEG) { startPreview(); }
@@ -316,38 +317,65 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
                         };
                 }
                 */
-            try {
-                mCamera.takePicture(null, rawCallback, jpegCallback);
-            } catch (RuntimeException re) {
-                logger.error(re.toString());
-                Toast.makeText(getContext(), re.toString(), Toast.LENGTH_LONG).show();
+        try {
+            mCamera.takePicture(null, rawCallback, jpegCallback);
+        } catch (RuntimeException re) {
+            logger.error(re.toString());
+            Toast.makeText(getContext(), re.toString(), Toast.LENGTH_LONG).show();
+        }
+        // isPreview_ = false;
+    }
+
+
+    /**
+     * Activate camera preview
+     */
+    public void startPreview() {
+        logger.debug("startPreview");
+        if (mCamera != null && !isPreview_) {
+            logger.debug("preview.startPreview(): do stuff");
+            mCamera.startPreview();
+            isPreview_ = true;
+        }
+    }
+
+    /**
+     * Stop camera preview
+     */
+    public void stopPreview() {
+        logger.debug("stopPreview");
+        if (mCamera != null) {
+            logger.debug("preview.stopPreview(): do stuff");
+            mCamera.stopPreview();
+            isPreview_ = false;
+        }
+    }
+
+    public void releaseCamera() {
+        stopPreview();
+        if (mCamera != null) {
+            mCamera.release();
+            mCamera = null;
+        }
+    }
+
+    public void reclaimCamera() {
+        if (mCamera == null) {
+            mCamera = getCameraInstance();
+            if (mCamera == null) {
+                Toast.makeText(getContext(), "Unable to obtain camera", Toast.LENGTH_LONG).show();
             }
-                // isPreview_ = false;
         }
+    }
 
+    public static Camera getCameraInstance() {
+        logger.debug("getCameraInstance()");
+        Camera c = null;
+        try {
+            c = Camera.open();
+        } catch (Exception e) {
 
-             /**
-         * Activate camera preview
-         */
-        public void startPreview() {
-                logger.debug("startPreview");
-                if ( mCamera != null && !isPreview_) {
-                        logger.debug("preview.startPreview(): do stuff");
-                        mCamera.startPreview();
-                        isPreview_ = true;
-                }
         }
-
-        /**
-         * Stop camera preview
-         */
-        public void stopPreview() {
-                logger.debug("stopPreview");
-                if ( mCamera != null ) {
-                        logger.debug("preview.stopPreview(): do stuff");
-                        mCamera.stopPreview();
-                        isPreview_ = false;
-                }
-        }
-
+        return c; // return null if no camera!
+    }
 }

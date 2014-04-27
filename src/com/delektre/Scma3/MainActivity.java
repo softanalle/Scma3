@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -46,10 +49,16 @@ public class MainActivity extends IOIOActivity {
     Camera mCamera;
     int mDefaultCameraId = -1;
 
+    @ViewById
+    Preview uiMainPreview;
+
+    @ViewById
+    ProgressBar uiMainProgress;
+
+
     ScmSeqCreator mSeqHandler;
-    private Preview mPreview;
+
     private int nCameras;
-    private ProgressBar mProgress;
 
     private boolean stillLoading = true;
 
@@ -63,6 +72,8 @@ public class MainActivity extends IOIOActivity {
 
 
     private int mLedCount = 6;
+    private long mWaitAfterDelay = 500;
+
     //protected static final Logger logger = LoggerFactory.getLogger();
 
     /**
@@ -76,11 +87,16 @@ public class MainActivity extends IOIOActivity {
 
         PropertyConfigurator.getConfigurator(this).configure();
 
-        initUI();
+        // test that everything (?) is in place
         testSystem();
+
+        // initialize user interface
+        initUI();
+
+        // initialize hardware (IOIO and such)
         initHardware();
 
-
+        // camera initialization is delayed
         initCamera();
         stillLoading = false;
     }
@@ -103,29 +119,34 @@ public class MainActivity extends IOIOActivity {
 
 
     private void initCamera() {
-        logger.debug("initCamera()");
-        mNumberOfCameras = Camera.getNumberOfCameras();
-        Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
-        for (int i = 0; i < mNumberOfCameras; i++) {
-            Camera.getCameraInfo(i, cameraInfo);
-            if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                mDefaultCameraId = i;
+        if (mCameraCurrentlyLocked == -1) {
+            logger.debug("initCamera()");
+            mNumberOfCameras = Camera.getNumberOfCameras();
+            Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+            for (int i = 0; i < mNumberOfCameras; i++) {
+                Camera.getCameraInfo(i, cameraInfo);
+                if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                    mDefaultCameraId = i;
+                }
             }
-        }
 
-        if (mDefaultCameraId == -1) {
-            // don't we have any camera?
-            if (nCameras > 0) {
-                mDefaultCameraId = 0;
+            if (mDefaultCameraId == -1) {
+                // don't we have any camera?
+                if (nCameras > 0) {
+                    mDefaultCameraId = 0;
+                } else {
+                    Toast toast = Toast.makeText(getApplicationContext(),
+                            R.string.err_no_cameras,
+                            Toast.LENGTH_LONG);
+                    toast.show();
+                    finish();
+                }
             } else {
-                Toast toast = Toast.makeText(getApplicationContext(),
-                        R.string.err_no_cameras,
-                        Toast.LENGTH_LONG);
-                toast.show();
-                finish();
+                mCameraCurrentlyLocked = mDefaultCameraId;
+                mCamera = Camera.open(mCameraCurrentlyLocked);
+                uiMainPreview.setCamera(mCamera);
             }
         }
-        mCameraCurrentlyLocked = mDefaultCameraId;
     }
 
 
@@ -136,9 +157,11 @@ public class MainActivity extends IOIOActivity {
         super.onPause();
         logger.debug("onPause()");
         if (mCamera != null) {
-            mPreview.setCamera(null);
-            mCamera.release();
+            //uiMainPreview.setCamera(null);
+            //mCamera.release();
+            uiMainPreview.releaseCamera();
             mCamera = null;
+            mCameraCurrentlyLocked = -1;
         }
 
     }
@@ -228,8 +251,13 @@ public class MainActivity extends IOIOActivity {
         if (!stillLoading) {
             logger.debug("onResume()");
             try {
-                mCamera = Camera.open(mCameraCurrentlyLocked);
-                mPreview.setCamera(mCamera);
+                initCamera();
+                //uiMainPreview.reclaimCamera();
+                //mCamera = uiMainPreview.getCamera();
+
+                // mCamera = Camera.open(mCameraCurrentlyLocked);
+                // mCamera = uiMainPreview.getCameraInstance();
+                // uiMainPreview.setCamera(mCamera);
 
                 // TODO: kirjoita callback
                 mCamera.setPreviewCallback(mSeqHandler);
@@ -257,11 +285,9 @@ public class MainActivity extends IOIOActivity {
 
 
     private void initUI() {
-        mProgress = (ProgressBar) findViewById(R.id.ui_main_progress);
+        // mProgress = (ProgressBar) findViewById(R.id.ui_main_progress);
 
 
-        //clickButton = (Button) findViewById(id.ui_main_click_button);
-        //zoomButton = (Button) findViewById(id.ui_main_focus_button);
 
         //mProgress = (ProgressBar) findViewById(R.id.ui_main_progress);
         //mSeqHandler = new ScmSeqCreator(mProgress);
@@ -271,34 +297,26 @@ public class MainActivity extends IOIOActivity {
         CrosshairOverlay co = (CrosshairOverlay) findViewById(id.crosshairoverlay1);
 
         nCameras = Camera.getNumberOfCameras();
-        mPreview = (Preview) findViewById(id.ui_main_preview);
 
-        mSeqHandler = new ScmSeqCreator(mPreview);
+        mSeqHandler = new ScmSeqCreator(uiMainPreview);
 
-        /*
-        clickButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mProgress.setProgress(0);
-                File tmp = new File(Environment.getExternalStorageDirectory(), "/SCM");
-                for (int i = 0; i < 6; i++) {
-                    mProgress.setProgress(i * 12);
-                    mPreview.savePicture(saveDir + "test_" + i);
-                }
-            }
-        });
-        zoomButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                logger.debug("preview.doFocus()");
-                mCamera.autoFocus(null);
-            }
-        });
-        */
+    }
+
+    void beep() {
+        logger.debug("beep() called");
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Click
     void uiMainButtonFocus() {
+        beep();
+        uiMainProgress.setProgress(0);
         logger.debug("uiMainButtonFocus()");
         mCamera.autoFocus(null);
     }
@@ -306,15 +324,58 @@ public class MainActivity extends IOIOActivity {
     @Click
     void uiMainButtonPicture() {
         logger.debug("uiMainButtonPicture()");
-        mProgress.setProgress(0);
-        File tmp = new File(Environment.getExternalStorageDirectory(), "/SCM");
-        for (int i = 0; i < 6; i++) {
-            mProgress.setProgress(i * 12);
-            mPreview.savePicture(saveDir + "test_" + i);
-        }
+        uiMainProgress.setProgress(0);
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                takeColorSeries();
+            }
+        };
+
+        // run the image taking thread
+        new Thread(runnable).start();
     }
 
+    private void takePictureWithLed(int led_, String namePrefix) {
+        mLedState[led_] = true;
 
+        mLedState[led_] = false;
+    }
+
+    private void takeColorSeries() {
+        logger.debug("takeColorSeries() start");
+
+        int i = -1;
+
+        // File tmp = new File(Environment.getExternalStorageDirectory(), "/SCM");
+
+        try {
+
+
+            for (i = 0; i < 6; i++) {
+
+                takePictureWithLed(i, "test_" + i);
+                //mLedState[i] = true;
+
+
+                uiMainPreview.savePicture(saveDir + "test_" + i);
+                Thread.sleep(mWaitAfterDelay);
+                mCamera.startPreview();
+
+                //mLedState[i] = false;
+                beep();
+            }
+        } catch (NullPointerException npe) {
+            logger.error("takeColorSeries() got NullPointerException on i=" + i);
+        } catch (RuntimeException re) {
+            logger.error("takeColorSeries(): " + re.toString());
+        } catch (Exception e) {
+            logger.error("takeColorSeries() got: " + e.toString());
+        }
+
+        logger.debug("takeColorSeries() completed");
+    }
 
     private String saveDir;
 
@@ -340,7 +401,7 @@ public class MainActivity extends IOIOActivity {
             }
 
             nCameras = Camera.getNumberOfCameras();
-            mPreview = (Preview) findViewById(id.ui_main_preview);
+            // mPreview = (Preview) findViewById(id.ui_main_preview);
 
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Error: " + e.toString(), Toast.LENGTH_LONG).show();
@@ -466,14 +527,10 @@ public class MainActivity extends IOIOActivity {
             pwmOutput5_.setPulseWidth(0);
             pwmOutput6_.setPulseWidth(0);
 
-            logger.debug("Hardware: " +
-                    ioio_.getImplVersion(IOIO.VersionType.HARDWARE_VER));
-            logger.debug("Boot loader: " +
-                    ioio_.getImplVersion(IOIO.VersionType.BOOTLOADER_VER));
-            logger.debug("App firmware: " +
-                    ioio_.getImplVersion(IOIO.VersionType.APP_FIRMWARE_VER));
-            logger.debug("IOIO Lib: " +
-                    ioio_.getImplVersion(IOIO.VersionType.IOIOLIB_VER));
+            logger.debug("Hardware: " + ioio_.getImplVersion(IOIO.VersionType.HARDWARE_VER));
+            logger.debug("Boot loader: " + ioio_.getImplVersion(IOIO.VersionType.BOOTLOADER_VER));
+            logger.debug("App firmware: " + ioio_.getImplVersion(IOIO.VersionType.APP_FIRMWARE_VER));
+            logger.debug("IOIO Lib: " + ioio_.getImplVersion(IOIO.VersionType.IOIOLIB_VER));
 
             //mFocusCount = 0;
             //mFocusOn = false;
@@ -648,17 +705,7 @@ public class MainActivity extends IOIOActivity {
         //}
     }
 
-    /*
-        protected void onPause() {
-            super.onPause();
-            logger.debug(this.getLocalClassName() + ".onPause()");
-        }
 
-        protected void onResume() {
-            super.onResume();
-            logger.debug(this.getLocalClassName() + ".onResume()");
-        }
-    */
     public Handler _messagehandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
