@@ -280,6 +280,7 @@ public class IOIOController extends IOIOActivity {
         }
 
         configureLeds();
+
     }
 
     private void getSettings() {
@@ -351,4 +352,7 @@ public class IOIOController extends IOIOActivity {
             }
         }
     };
+    public void setLedState(int index, boolean state) {
+
+    }
 }

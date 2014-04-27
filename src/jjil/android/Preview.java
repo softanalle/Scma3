@@ -1,26 +1,22 @@
 package jjil.android;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.List;
-
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.Size;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Display;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Toast;
-import com.delektre.Scma3.MainActivity;
 import com.google.code.microlog4android.Logger;
 import com.google.code.microlog4android.LoggerFactory;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * A simple wrapper around a Camera and a SurfaceView that renders a centered preview of the Camera
@@ -36,7 +32,9 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
     public interface PreviewSizeChangedCallback {
         void previewSizeChanged();
     }
-    
+
+
+
     private Camera mCamera;
     private SurfaceHolder mHolder;
     private Size mPreviewSize;
@@ -46,6 +44,7 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
     
     public Preview(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
+
         mSurfaceView = new SurfaceView(context, attributeSet);
         addView(mSurfaceView);
         // Install a SurfaceHolder.Callback so we get notified when the
@@ -317,7 +316,12 @@ public class Preview extends ViewGroup implements SurfaceHolder.Callback {
                         };
                 }
                 */
-                mCamera.takePicture(null,  rawCallback, jpegCallback);
+            try {
+                mCamera.takePicture(null, rawCallback, jpegCallback);
+            } catch (RuntimeException re) {
+                logger.error(re.toString());
+                Toast.makeText(getContext(), re.toString(), Toast.LENGTH_LONG).show();
+            }
                 // isPreview_ = false;
         }
 
