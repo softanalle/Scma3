@@ -25,7 +25,6 @@ import static com.delektre.Scma3.R.id;
 import static com.delektre.Scma3.R.layout;
 
 
-
 public class MainActivity extends Activity {
     protected static final Logger logger = LoggerFactory.getLogger();
 
@@ -135,36 +134,6 @@ public class MainActivity extends Activity {
 
     }
 
-    protected void onResume() {
-        super.onResume();
-        if ( ! stillLoading) {
-            logger.debug("onResume()");
-            mCamera = Camera.open(mCameraCurrentlyLocked);
-            mPreview.setCamera(mCamera);
-
-            // TODO: kirjoita callback
-            mCamera.setPreviewCallback(mSeqHandler);
-
-            String focusMode = mCamera.getParameters().getFocusMode();
-            if (focusMode.equals(Camera.Parameters.FOCUS_MODE_AUTO)
-                    || focusMode.equals(Camera.Parameters.FOCUS_MODE_MACRO)) {
-                //original code from the book
-//            mCamera.autoFocus(mReadBarcode);
-                //delayed focusing works on more devices
-                mSeqHandler.autoFocusLater(mCamera);
-            } else {
-            }
-            getSettings();
-                    //delayed focusing works on more devices
-                    mSeqHandler.autoFocusLater(mCamera);
-                } else {
-                }
-            } catch (RuntimeException re) {
-                logger.error(re.getMessage());
-            }
-        }
-    }
-
     private void getSettings() {
         logger.debug("getSettings()");
         String dump = "before";
@@ -199,6 +168,40 @@ public class MainActivity extends Activity {
         }
     }
 
+
+    protected void onResume() {
+        super.onResume();
+        if (!stillLoading) {
+            logger.debug("onResume()");
+            try {
+                mCamera = Camera.open(mCameraCurrentlyLocked);
+                mPreview.setCamera(mCamera);
+
+                // TODO: kirjoita callback
+                mCamera.setPreviewCallback(mSeqHandler);
+
+                String focusMode = mCamera.getParameters().getFocusMode();
+                if (focusMode.equals(Camera.Parameters.FOCUS_MODE_AUTO)
+                        || focusMode.equals(Camera.Parameters.FOCUS_MODE_MACRO)) {
+                    //original code from the book
+//            mCamera.autoFocus(mReadBarcode);
+                    //delayed focusing works on more devices
+                    mSeqHandler.autoFocusLater(mCamera);
+                } else {
+                }
+                getSettings();
+                //delayed focusing works on more devices
+                mSeqHandler.autoFocusLater(mCamera);
+                //}else{
+                //}
+            } catch (RuntimeException re) {
+                logger.error(re.getMessage());
+            }
+        }
+
+    }
+
+
     private void initUI() {
         mProgress = (ProgressBar) findViewById(R.id.ui_main_progress);
         mSeqHandler = new ScmSeqCreator(mProgress);
@@ -218,7 +221,7 @@ public class MainActivity extends Activity {
                 File tmp = new File(Environment.getExternalStorageDirectory(), "/SCM");
                 for (int i = 0; i < 6; i++) {
                     mProgress.setProgress(i * 12);
-                    mPreview.savePicture(saveDir +  "test_" + i);
+                    mPreview.savePicture(saveDir + "test_" + i);
                 }
             }
         });
