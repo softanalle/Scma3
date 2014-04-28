@@ -39,6 +39,8 @@ import static com.delektre.Scma3.R.id;
 import static com.delektre.Scma3.R.layout;
 
 
+@NoTitle
+@Fullscreen
 
 @EActivity(layout.main)
 public class MainActivity extends IOIOActivity {
