@@ -10,8 +10,10 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import com.google.code.microlog4android.Logger;
 import com.google.code.microlog4android.LoggerFactory;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,6 +26,7 @@ import java.util.List;
  * support preview sizes at the same aspect ratio as the device's display.
  */
 public class Preview extends ViewGroup implements SurfaceHolder.Callback {
+
     private final String TAG = "Preview";
 
     protected static final Logger logger = LoggerFactory.getLogger();

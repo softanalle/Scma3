@@ -1,25 +1,35 @@
 package com.delektre.Scma3;
 
+import android.content.Context;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.ProgressBar;
-import jjil.android.CrosshairOverlay;
-import jjil.android.Preview;
+import com.google.code.microlog4android.Logger;
+import com.google.code.microlog4android.LoggerFactory;
+import org.androidannotations.annotations.EBean;
+//import com.delektre.Scma3.CrosshairOverlay;
+//import com.delektre.Scma3.Preview;
 
 /**
  * Created by t2r on 4/6/14.
  */
+
+@EBean
 public class ScmSeqCreator implements android.hardware.Camera.PreviewCallback,
         android.hardware.Camera.AutoFocusCallback{
 
+    protected static final Logger logger = LoggerFactory.getLogger();
+
     private static final String TAG = "ScmSeqCreator";
 
-    private ProgressBar mProgress;
+    //private ProgressBar mProgress;
     private Handler handler = new Handler();
     private Preview mPreview;
+    Context context_;
 
-    public ScmSeqCreator(Preview preview) { //double dPerpPos, TextView tv, CheckBox ck, CrosshairOverlay co) {
+    public ScmSeqCreator(Context max) { //double dPerpPos, TextView tv, CheckBox ck, CrosshairOverlay co) {
+        context_ = max;
         /*
         me13b = new Ean13Barcode1D();
         mdBarcodePerpPos = dPerpPos;
@@ -28,12 +38,16 @@ public class ScmSeqCreator implements android.hardware.Camera.PreviewCallback,
         mCrosshairOverlay = co;
         */
         //mProgress = pProgress;
+    }
+
+    public void setPreview(Preview preview) {
+        logger.debug(TAG + ".setPreview()");
         mPreview = preview;
     }
 
     @Override
     public void onAutoFocus(boolean success, Camera camera) {
-        Log.d(TAG, "on auto focus " + success);
+        logger.debug(TAG + ".onAutoFocus( " + success + ", Camera)");
         if (!success) {
             // try again
 
@@ -41,8 +55,9 @@ public class ScmSeqCreator implements android.hardware.Camera.PreviewCallback,
 //            camera.autoFocus(this);
             autoFocusLater(camera);
         } else {
-            Log.d(TAG, "reset mnFocus");
-            mnFocused = 15;
+            logger.debug(TAG + ".onAutoFocus(): reset mnFocus");
+            // mnFocused = 15;
+            // mHasFocus = false;
         }
     }
 
@@ -67,7 +82,9 @@ public class ScmSeqCreator implements android.hardware.Camera.PreviewCallback,
      */
     public void autoFocusLater(final Camera camera)
     {
+        logger.debug(TAG + ".autoFocusLater()");
         final ScmSeqCreator finalContext = this;
+        mHasFocus = true;
         handler.postDelayed(new Runnable()
         {
             @Override
@@ -79,7 +96,7 @@ public class ScmSeqCreator implements android.hardware.Camera.PreviewCallback,
                 }
                 catch (RuntimeException e)
                 {
-                    Log.d(TAG, "error focusing, camera may be closing");
+                    logger.debug(TAG + ".autoFocusLater(): error focusing, camera may be closing");
                 }
             }
         }, 100);
@@ -89,11 +106,11 @@ public class ScmSeqCreator implements android.hardware.Camera.PreviewCallback,
     /**
      * mbFocused is true when the camera has successfully autofocused
      */
-    int mnFocused = 0;
+
+    boolean mHasFocus = false;
 
 
-
-    private CrosshairOverlay mCrosshairOverlay;
+//    private CrosshairOverlay mCrosshairOverlay;
 
 
 }
