@@ -53,6 +53,7 @@ public class MainActivity extends Activity {
 
     @OptionsItem
     void optMenuQuitSelected() {
+        super.onStop();
         System.exit(0);
     }
 
@@ -342,15 +343,29 @@ public class MainActivity extends Activity {
     @Background
     void doFocus() {
         logger.debug(TAG + ".doFocus()");
-        if (mCamera != null)
-            mCamera.autoFocus(null);
+        try {
+            mService.setLedMode(6, true);
+            Thread.sleep(200);
+            if (mCamera != null)
+                mCamera.autoFocus(null);
+            Thread.sleep(200);
+            mService.setLedMode(6, false);
+        } catch (InterruptedException ie) {
+            logger.error(TAG + ".doFocus(ie): " + ie.toString());
+        } catch (Exception e) {
+            logger.error(TAG + ".doFocus(e): " + e.toString());
+        }
     }
 
     @Click
     void uiMainButtonPicture() {
         logger.debug(TAG + ".uiMainButtonPicture()");
         uiMainProgress.setProgress(0);
-        takeColorSeries();
+        if (mBound) {
+            takeColorSeries();
+        } else {
+            Toast.makeText(getApplicationContext(), "IOIO not ready", Toast.LENGTH_LONG).show();
+        }
     }
 
 

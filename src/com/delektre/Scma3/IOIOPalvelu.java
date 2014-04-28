@@ -50,15 +50,15 @@ public class IOIOPalvelu extends IOIOService {
     private static int delayCounter = 0;
 
 
-    private static final int LED_INDEX_GREEN = 0;
-    private static final int LED_INDEX_BLUE = 1;
-    private static final int LED_INDEX_RED = 2;
-    private static final int LED_INDEX_WHITE = 3;
-    private static final int LED_INDEX_YELLOW = 4;
-    private static final int LED_INDEX_NIR = 5;
+    public static final int LED_INDEX_GREEN = 0;
+    public static final int LED_INDEX_BLUE = 1;
+    public static final int LED_INDEX_RED = 2;
+    public static final int LED_INDEX_WHITE = 3;
+    public static final int LED_INDEX_YELLOW = 4;
+    public static final int LED_INDEX_NIR = 5;
 
-    private static final int LED_INDEX_FOCUS = 6;
-    private static final int LED_INDEX_CALIBRATE = 7;
+    public static final int LED_INDEX_FOCUS = 6;
+    public static final int LED_INDEX_CALIBRATE = 7;
 
     public static final String KEY_PREF_FOCUSCOLOR = "conf_focusled_color";
     // public static final String KEY_PREF_DEFAULT_PULSEWIDTH = "conf_pwm_default";
